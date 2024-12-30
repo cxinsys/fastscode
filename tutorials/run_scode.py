@@ -1,0 +1,51 @@
+import os
+import os.path as osp
+import argparse
+
+import numpy as np
+
+import fastscode as fs
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='parameter parser')
+    parser.add_argument('--droot', type=str, dest='droot', required=False, default=osp.abspath('./'))
+    parser.add_argument('--fp_exp', type=str, dest='fp_exp', required=True)
+    parser.add_argument('--fp_trj', type=str, dest='fp_trj', required=True)
+    parser.add_argument('--max_iter', type=int, dest='max_iter', required=False, default=100)
+    parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
+    parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
+    parser.add_argument('--sampling_batch', type=int, dest='sb', required=False, default=100)
+    parser.add_argument('--chunk_size', type=int, dest='chunk_size', required=False, default=100)
+    parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False)
+
+    args = parser.parse_args()
+
+    droot = osp.abspath(args.droot)
+    dpath_exp_data = osp.join(droot, args.fp_exp)
+    dpath_trj_data = osp.join(droot, args.fp_trj)
+
+    max_iter = args.max_iter
+
+    spath_droot = osp.join(droot, args.sp_droot)
+
+    backend = args.backend
+    num_devices = args.num_devices
+    sb = args.sb
+    chunk_size = args.chunk_size
+
+    exp_data = np.loadtxt(dpath_exp_data, delimiter="\t")
+    pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")[:, 1]
+
+    worker = fs.FastSCODE(exp_data=exp_data,
+                          pseudotime=pseudotime,
+                          droot=spath_droot,
+                          num_tf=None,
+                          num_cell=None,
+                          num_z=10,
+                          max_iter=max_iter,
+                          dtype=np.float64)
+
+    rss, W, A, B = worker.run(backend=backend,
+                              device_ids=num_devices,
+                              sampling_batch=sb,
+                              chunk_size=chunk_size)
