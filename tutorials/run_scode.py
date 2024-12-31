@@ -11,12 +11,14 @@ if __name__ == "__main__":
     parser.add_argument('--droot', type=str, dest='droot', required=False, default=osp.abspath('./'))
     parser.add_argument('--fp_exp', type=str, dest='fp_exp', required=True)
     parser.add_argument('--fp_trj', type=str, dest='fp_trj', required=True)
+    parser.add_argument('--num_z', type=int, dest='num_z', required=False, default=10)
     parser.add_argument('--max_iter', type=int, dest='max_iter', required=False, default=100)
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
     parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
     parser.add_argument('--sampling_batch', type=int, dest='sb', required=False, default=100)
     parser.add_argument('--chunk_size', type=int, dest='chunk_size', required=False, default=100)
     parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False)
+    parser.add_argument('--num_repeat', type=int, dest='repeat', required=False, default=1)
 
     args = parser.parse_args()
 
@@ -24,6 +26,7 @@ if __name__ == "__main__":
     dpath_exp_data = osp.join(droot, args.fp_exp)
     dpath_trj_data = osp.join(droot, args.fp_trj)
 
+    num_z = args.num_z
     max_iter = args.max_iter
 
     spath_droot = osp.join(droot, args.sp_droot)
@@ -33,19 +36,38 @@ if __name__ == "__main__":
     sb = args.sb
     chunk_size = args.chunk_size
 
-    exp_data = np.loadtxt(dpath_exp_data, delimiter="\t")
-    pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")[:, 1]
+    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
+    node_name = exp_data[0, 1:]
+    exp_data = exp_data[1:, 1:].astype(np.float64).T
+    pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")
 
-    worker = fs.FastSCODE(exp_data=exp_data,
-                          pseudotime=pseudotime,
-                          droot=spath_droot,
-                          num_tf=None,
-                          num_cell=None,
-                          num_z=10,
-                          max_iter=max_iter,
-                          dtype=np.float64)
+    repeats = np.arange(args.repeat, dtype=np.int32)
 
-    rss, W, A, B = worker.run(backend=backend,
-                              device_ids=num_devices,
-                              sampling_batch=sb,
-                              chunk_size=chunk_size)
+    As = []
+    for r in repeats:
+        spath_droot_r = osp.join(spath_droot, str(r))
+
+        worker = fs.FastSCODE(exp_data=exp_data,
+                              pseudotime=pseudotime,
+                              node_name=node_name,
+                              droot=spath_droot_r,
+                              num_tf=None,
+                              num_cell=None,
+                              num_z=num_z,
+                              max_iter=max_iter,
+                              dtype=np.float64)
+
+        rss, W, A, B = worker.run(backend=backend,
+                                  device_ids=num_devices,
+                                  sampling_batch=sb,
+                                  chunk_size=chunk_size)
+
+        As.append(A)
+
+    mean_A = np.mean(As, axis=0)
+    tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
+    extended_nn = np.concatenate((['TE'], node_name))
+    tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
+    np.savetxt(os.path.join(droot, "meanA.txt"), tmp_rm, delimiter="\t", fmt="%s")
+
+

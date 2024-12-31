@@ -20,6 +20,7 @@ class FastSCODE(object):
                  dpath_trj_data=None,
                  droot=None,
                  exp_data=None,
+                 node_name=None,
                  pseudotime=None,
                  num_tf=None,
                  num_cell=None,
@@ -31,6 +32,7 @@ class FastSCODE(object):
                  ):
 
         self.exp_data = None
+        self.node_name = None
         self.pseudotime = None
 
         if exp_data is not None:
@@ -40,12 +42,15 @@ class FastSCODE(object):
                 raise ValueError("pseudotime data should be defined if using expression data directly")
 
             self.pseudotime = pseudotime  # (cell)
+            self.node_name = node_name
         else:
             if not dpath_exp_data or not dpath_exp_data:
                 raise ValueError("One of the following variable is not defined correctly: "
                                  "dpath_exp_data, dpath_trj_data")
 
-            self.exp_data = np.loadtxt(dpath_exp_data, delimiter="\t")
+            exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
+            self.node_name = exp_data[0, 1:]
+            self.exp_data = exp_data[1:, 1:].astype(dtype).T
             self.pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")
             self.pseudotime = self.pseudotime[:, 1]
 
@@ -96,7 +101,7 @@ class FastSCODE(object):
         partsum_rss = np.zeros(len(new_b))
         list_W = []
 
-        for i, start in enumerate(tqdm(range(0, len(X), batch_size), desc=f"Process {id}", position=id, leave=True)):
+        for i, start in enumerate(range(0, len(X), batch_size)):
             end = start + batch_size
 
             batch_X = X[start:end]
@@ -192,8 +197,9 @@ class FastSCODE(object):
               .format(backend, len(list_backend), procs_per_device, sampling_batch, chunk_size))
 
         with multiprocessing.Pool(processes=len(list_backend) * procs_per_device) as pool:
-            for i in range(1, self.max_iter + 1):
-                print("[ITER] {}/{}, [Num. Sampling] {}".format(i, self.max_iter, i*sampling_batch))
+            pbar = tqdm(range(1, self.max_iter + 1))
+            for i in pbar:
+                pbar.set_description("[ITER] {}/{}, [Num. Sampling] {}".format(i, self.max_iter, i*sampling_batch))
                 target = np.random.randint(0, self.num_z, size=sampling_batch)
                 new_b[np.arange(len(new_b)), target] = np.random.uniform(low=self.min_b, high=self.max_b, size=sampling_batch)
 
@@ -243,6 +249,6 @@ class FastSCODE(object):
             A = W @ b_matrix @ invW
 
         if self.droot is not None:
-            save_results(droot=self.droot, rss=RSS, W=W, A=A, B=b_matrix)
+            save_results(droot=self.droot, rss=RSS, W=W, A=A, B=b_matrix, node_name=self.node_name)
 
         return RSS, W, A, b_matrix

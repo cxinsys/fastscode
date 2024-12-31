@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='fastscode',
-      version='0.0.1',
+      version='0.0.2',
       description='FastSCODE',
       # url='http://github.com/cxinsys/fasttenet',
       author='Complex Intelligent Systems Laboratory (CISLAB)',
@@ -10,5 +10,5 @@ setup(name='fastscode',
       long_description=open('README.md').read(),
       long_description_content_type='text/markdown',
       packages=find_packages(),
-      install_requires=['numpy', 'statsmodels', 'networkx', 'tqdm', 'matplotlib', 'omegaconf', 'mate-cxinsys', 'scikit-learn'],
+      install_requires=['numpy', 'statsmodels', 'networkx', 'tqdm', 'matplotlib', 'omegaconf', 'fasttenet', 'scikit-learn'],
       zip_safe=False,)

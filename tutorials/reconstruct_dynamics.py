@@ -14,14 +14,14 @@ if __name__ == "__main__":
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='cpu')
     parser.add_argument('--num_device', type=int, dest='num_device', required=False, default=1)
     parser.add_argument('--length', type=int, dest='length', required=False, default=100)
-    parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=100)
+    parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=10)
     parser.add_argument('--fpath_out', type=str, dest='fpath_out', required=False)
 
     args = parser.parse_args()
 
     droot = osp.abspath(args.droot)
     dpath_init = osp.join(droot, args.fp_init)
-    dpath_rm = osp.join(droot, args.fp_rm)
+    fpath_rm = osp.join(droot, args.fp_rm)
 
     fpath_out = osp.join(droot, args.fpath_out)
 
@@ -32,11 +32,12 @@ if __name__ == "__main__":
     batch_size =args.batch_size
 
     # init = np.loadtxt(dpath_init, delimiter="\t", usecols=[1],)
-    result_matrix = np.loadtxt(dpath_rm, delimiter="\t")
-    init = np.random.rand(len(result_matrix))
+    result = np.loadtxt(fpath_rm, delimiter='\t', dtype=str)
+    result = result[1:, 1:].astype(np.float64)
+    init = np.random.rand(len(result))
 
     worker = fs.Simulator(init=init,
-                          result_matrix=result_matrix,
+                          result_matrix=result,
                           num_times=length,
                           fpath_out=fpath_out)
 
