@@ -7,7 +7,7 @@ import scipy
 import statsmodels.sandbox.stats.multicomp
 import networkx as nx
 
-import fasttenet as fte
+from fastscode.inference.inference import NetWeaver
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='dpath parser')
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     result = result[1:, 1:].astype(np.float64)
     result = np.abs(result)
 
-    weaver = fte.NetWeaver(result_matrix=result,
+    weaver = NetWeaver(result_matrix=result,
                            gene_names=gene_names,
                            links=links,
                            is_trimming=True,

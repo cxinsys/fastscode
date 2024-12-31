@@ -1,0 +1,1 @@
+from fastscode.inference.inference import NetWeaver
