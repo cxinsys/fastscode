@@ -39,6 +39,9 @@ if __name__ == "__main__":
     exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
     node_name = exp_data[0, 1:]
     exp_data = exp_data[1:, 1:].astype(np.float64).T
+    # min-max norm
+    exp_data = (exp_data - np.min(exp_data, axis=1)[:, None]) / \
+               (np.max(exp_data, axis=1) - np.min(exp_data, axis=1))[:, None]
     pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")
 
     repeats = np.arange(args.repeat, dtype=np.int32)
