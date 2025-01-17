@@ -1,16 +1,20 @@
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 import os.path as osp
-import argparse
 
 import numpy as np
 
-import fastscode as fs
+from fastscode.fastscode import FastSCODE
+from fastscode.inference.inference import NetWeaver
+
+
 
 if __name__ == "__main__":
-    droot = osp.abspath(sys.argv[1])  # droot
-    dpath_exp_data = osp.join(droot, sys.argv[2])  # expression data
-    dpath_trj_data = osp.join(droot, sys.argv[3])  # pseudotime data
+    dpath_exp_data = sys.argv[1]  # expression data
+    dpath_trj_data = sys.argv[2]  # pseudotime data
+    dpath_branch_data = sys.argv[3]
 
     num_z = int(sys.argv[4])  # number of z
     max_iter = int(sys.argv[5])  # number of iteration
@@ -20,23 +24,26 @@ if __name__ == "__main__":
     sb = int(sys.argv[8])  # sampling batch size
     chunk_size = int(sys.argv[9])  # chunk size
 
-    spath_droot = osp.join(droot, sys.argv[10])  # save path
-
-    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
+    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)  # cell x gene
     node_name = exp_data[0, 1:]
-    exp_data = exp_data[1:, 1:].astype(np.float64).T
+    exp_data = exp_data[1:, 1:].astype(np.float64).T  # gene x cell
     pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")
+    branch = np.loadtxt(dpath_branch_data, delimiter="\t")
 
-    repeats = np.arange(int(sys.argv[11]), dtype=np.int32)  # num repeat
+    pseudotime = pseudotime[branch == 1]
+    exp_data = exp_data[:, branch == 1]
+
+    repeats = np.arange(int(sys.argv[10]), dtype=np.int32)  # num repeat
+
+    links = int(sys.argv[11])
+    trim_threshold = float(sys.argv[12])
 
     As = []
     for r in repeats:
-        spath_droot_r = osp.join(spath_droot, str(r))
-
-        worker = fs.FastSCODE(exp_data=exp_data,
+        worker = FastSCODE(exp_data=exp_data,
                               pseudotime=pseudotime,
                               node_name=node_name,
-                              droot=spath_droot_r,
+                              droot=None,
                               num_tf=None,
                               num_cell=None,
                               num_z=num_z,
@@ -51,9 +58,35 @@ if __name__ == "__main__":
         As.append(A)
 
     mean_A = np.mean(As, axis=0)
-    tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
-    extended_nn = np.concatenate((['TE'], node_name))
-    tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
-    np.savetxt(os.path.join(droot, "meanA.txt"), tmp_rm, delimiter="\t", fmt="%s")
-
     # RSS, W, A and B will save under the droot directory
+
+    weaver = NetWeaver(result_matrix=mean_A,
+                                   gene_names=node_name,
+                                   links=links,
+                                   is_trimming=True,
+                                   trim_threshold=trim_threshold,
+                                   dtype=np.float64)
+
+    grns = weaver.run(backend=backend, device_ids=num_devices, batch_size=0)
+
+    dpath_grn = osp.abspath(osp.dirname(dpath_exp_data))
+
+    grn, trimmed_grn = grns
+    outdegrees = weaver.count_outdegree(grn)
+    trimmed_ods = weaver.count_outdegree(trimmed_grn)
+
+    fpath_save_grn = sys.argv[13]  # grn file name
+    np.savetxt(fpath_save_grn, grn, delimiter='\t', fmt="%s")
+    print('save grn in ', fpath_save_grn)
+
+    fpath_save_odg = sys.argv[14]  # outdegree file name
+    np.savetxt(fpath_save_odg, outdegrees, fmt="%s")
+    print('save grn outdegrees in ', fpath_save_odg)
+
+    fpath_save_trimmed_grn = sys.argv[15]  # trimmed grn file name
+    np.savetxt(fpath_save_trimmed_grn, trimmed_grn, delimiter='\t', fmt="%s")
+    print('save trimmed grn in ', fpath_save_trimmed_grn)
+
+    fpath_save_trimmed_odg = sys.argv[16]  # trimmed outdegree file name
+    np.savetxt(fpath_save_trimmed_odg, trimmed_ods, fmt="%s")
+    print('save trimmed grn outdegrees in ', fpath_save_trimmed_odg)

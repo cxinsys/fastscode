@@ -11,6 +11,7 @@ if __name__ == "__main__":
     parser.add_argument('--droot', type=str, dest='droot', required=False, default=osp.abspath('./'))
     parser.add_argument('--fp_exp', type=str, dest='fp_exp', required=True)
     parser.add_argument('--fp_trj', type=str, dest='fp_trj', required=True)
+    parser.add_argument('--fp_branch', type=str, dest='fp_branch', required=True)
     parser.add_argument('--num_z', type=int, dest='num_z', required=False, default=10)
     parser.add_argument('--max_iter', type=int, dest='max_iter', required=False, default=100)
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     droot = osp.abspath(args.droot)
     dpath_exp_data = osp.join(droot, args.fp_exp)
     dpath_trj_data = osp.join(droot, args.fp_trj)
+    dpath_branch_data = osp.join(droot, args.fp_branch)
 
     num_z = args.num_z
     max_iter = args.max_iter
@@ -36,13 +38,18 @@ if __name__ == "__main__":
     sb = args.sb
     chunk_size = args.chunk_size
 
-    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
+    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)  # cell x gene
     node_name = exp_data[0, 1:]
-    exp_data = exp_data[1:, 1:].astype(np.float64).T
+    exp_data = exp_data[1:, 1:].astype(np.float64).T  # gene x cell
+
     # min-max norm
     exp_data = (exp_data - np.min(exp_data, axis=1)[:, None]) / \
                (np.max(exp_data, axis=1) - np.min(exp_data, axis=1))[:, None]
     pseudotime = np.loadtxt(dpath_trj_data, delimiter="\t")
+    branch = np.loadtxt(dpath_branch_data, delimiter="\t")
+
+    pseudotime = pseudotime[branch == 1]
+    exp_data = exp_data[:, branch == 1]
 
     repeats = np.arange(args.repeat, dtype=np.int32)
 
