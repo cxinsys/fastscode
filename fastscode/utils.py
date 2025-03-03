@@ -21,8 +21,8 @@ def save_results(droot, rss, W, A, B, node_name):
     np.savetxt(os.path.join(droot, "B.txt"), B, delimiter="\t", fmt="%.14f")
 
 
-def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, dtype=np.float32):
-    # 데이터 타입 크기 (float64는 8바이트)
+def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, num_gpus, dtype=np.float32):
+    # 데이터 타입 크기
     dtype_size = np.dtype(dtype).itemsize
 
     # 크기 정보
@@ -37,10 +37,10 @@ def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, dtype=np.float
     # 중간 계산 배열 메모리 크기
     Z_memory = s * z * c * dtype_size                     # Z
     XtX_memory = s * z * z * dtype_size                   # XtX
-    Xty_memory = s * z * batch * dtype_size                   # Xty
-    W_memory = s * batch * z * dtype_size                     # W
-    WZ_memory = s * batch * c * dtype_size                    # WZ
-    diffs_memory = s * batch * c * dtype_size                 # diffs
+    Xty_memory = s * z * batch * dtype_size               # Xty
+    W_memory = s * batch * z * dtype_size                 # W
+    WZ_memory = s * batch * c * dtype_size                # WZ
+    diffs_memory = s * batch * c * dtype_size             # diffs
 
     fix_memory = (pseudotime_memory + new_b_memory + Z_memory + XtX_memory) / (1024 ** 2)
     other = (exp_data_memory + Xty_memory + W_memory + WZ_memory + diffs_memory + diffs_memory) / (1024 ** 2)
@@ -92,15 +92,15 @@ def calculate_batchsize(batch,
     free_mem = gpu_mem - (fix * num_ppd)
 
     if free_mem < 0:
-        raise ValueError("The number of processors you want to use is too many for the batch size. ")
+        raise ValueError("The batch size or procs_per_device value is too large.")
 
 
     remain_mem = free_mem - other
 
     dtype_size = np.dtype(dtype).itemsize
 
-    one_batch_mem = exp_data_shape[1] * dtype_size / (1024 ** 2)
-    outer_batch = np.ceil(remain_mem / (one_batch_mem * num_gpus)).astype(np.int32)
+    single_node_mem = exp_data_shape[1] * dtype_size / (1024 ** 2)
+    outer_batch = np.ceil(remain_mem / (single_node_mem * num_gpus)).astype(np.int32)
 
     if outer_batch < 0:
         raise ValueError("The number of processors you want to use is too many for the batch size. ")

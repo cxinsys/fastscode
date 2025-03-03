@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
     parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
     parser.add_argument('--sampling_batch', type=int, dest='sb', required=False, default=100)
-    parser.add_argument('--chunk_size', type=int, dest='chunk_size', required=False, default=100)
+    parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=100)
     parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False)
     parser.add_argument('--num_repeat', type=int, dest='repeat', required=False, default=1)
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     backend = args.backend
     num_devices = args.num_devices
     sb = args.sb
-    chunk_size = args.chunk_size
+    batch_size = args.batch_size
 
     exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)  # cell x gene
     node_name = exp_data[0, 1:]
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         rss, W, A, B = worker.run(backend=backend,
                                   device_ids=num_devices,
                                   sampling_batch=sb,
-                                  chunk_size=chunk_size)
+                                  batch_size=batch_size)
 
         As.append(A)
 

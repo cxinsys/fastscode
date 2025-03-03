@@ -14,7 +14,7 @@ from fastscode.inference.inference import NetWeaver
 if __name__ == "__main__":
     dpath_exp_data = sys.argv[1]  # expression data
     dpath_trj_data = sys.argv[2]  # pseudotime data
-    dpath_branch_data = sys.argv[3]
+    dpath_branch_data = sys.argv[3]  # cell select data
 
     num_z = int(sys.argv[4])  # number of z
     max_iter = int(sys.argv[5])  # number of iteration
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     backend = sys.argv[6]  # backend, 'gpu', 'torch', etc..
     num_devices = int(sys.argv[7])  # number of devices
     sb = int(sys.argv[8])  # sampling batch size
-    chunk_size = int(sys.argv[9])  # chunk size
+    batch_size = int(sys.argv[9])  # chunk size
 
     exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)  # cell x gene
     node_name = exp_data[0, 1:]
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         rss, W, A, B = worker.run(backend=backend,
                                   device_ids=num_devices,
                                   sampling_batch=sb,
-                                  chunk_size=chunk_size)
+                                  batch_size=batch_size)
 
         As.append(A)
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                                    trim_threshold=trim_threshold,
                                    dtype=np.float64)
 
-    grns = weaver.run(backend=backend, device_ids=num_devices, batch_size=0)
+    grns = weaver.run(backend=backend, device_ids=num_devices, batch_size=100)
 
     dpath_grn = osp.abspath(osp.dirname(dpath_exp_data))
 

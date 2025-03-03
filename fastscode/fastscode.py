@@ -127,7 +127,7 @@ class FastSCODE(object):
             device_ids=None,
             procs_per_device=None,
             sampling_batch=1,
-            chunk_size=100,
+            batch_size=100,
             seed=None
             ):
 
@@ -162,16 +162,18 @@ class FastSCODE(object):
         new_b = np.random.uniform(low=self.min_b, high=self.max_b, size=(sampling_batch, self.num_z)).astype(np.float32) # (B, p)
         old_b = np.zeros(new_b.shape[-1], dtype=new_b.dtype) # (p)
 
-        if not chunk_size:
-            chunk_size = len(self.exp_data)
+        if not batch_size:
+            batch_size = len(self.exp_data)
 
-        print("[Batch Size auto calculated]")
-        outer_batch = calculate_batchsize(batch=chunk_size,
-                                        exp_data_shape=self.exp_data.shape,
-                                        new_b_shape=new_b.shape,
-                                        dtype=self.dtype,
-                                        num_gpus=len(device_ids),
-                                        num_ppd=procs_per_device)
+        # print("[Batch Size auto calculated]")
+        # outer_batch = calculate_batchsize(batch=batch_size,
+        #                                 exp_data_shape=self.exp_data.shape,
+        #                                 new_b_shape=new_b.shape,
+        #                                 dtype=self.dtype,
+        #                                 num_gpus=len(device_ids),
+        #                                 num_ppd=procs_per_device)
+        outer_batch = np.ceil(len(self.exp_data) / (len(device_ids) * procs_per_device)).astype(np.int32)
+
 
         multiprocessing.set_start_method('spawn', force=True)
 
@@ -189,12 +191,12 @@ class FastSCODE(object):
             list_backend.append(backend + ":" + str(device_ids[j % len(device_ids)]))
             list_data.append(self.exp_data[start:end, :])
             list_time.append(self.pseudotime)
-            list_batch.append(chunk_size)
+            list_batch.append(batch_size)
             list_id.append(j)
             list_dtype.append(self.dtype)
 
-        print("[DEVICE: {}, Num. GPUS: {}, Process per device: {}, Sampling Batch: {}, Chunk Size: {}"
-              .format(backend, len(list_backend), procs_per_device, sampling_batch, chunk_size))
+        print("[DEVICE: {}, Num. GPUS: {}, Process per device: {}, Sampling Batch: {}, Batch Size: {}]"
+              .format(backend, len(device_ids), procs_per_device, sampling_batch, batch_size))
 
         with multiprocessing.Pool(processes=len(list_backend) * procs_per_device) as pool:
             pbar = tqdm(range(1, self.max_iter + 1))

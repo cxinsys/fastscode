@@ -104,7 +104,7 @@ class NetWeaver(object):
 
         if self.is_trimming:
             if not batch_size:
-                print("[Batch Size auto calculated]")
+                print("[Batch Size auto calculated]", self.result_matrix.shape)
                 batch_size = calculate_batchsize(shape=self.result_matrix.shape,
                                                  dtype=self.dtype,
                                                  num_gpus=len(device_ids),
