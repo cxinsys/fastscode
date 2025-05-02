@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/logo.png" alt="Drawing" width="395px"/></p>
+<p align="center"><img src="assets/logo.png" alt="Drawing" width="600px"/></p>
 
 
 ## Indroduction
