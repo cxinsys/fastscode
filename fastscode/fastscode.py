@@ -67,8 +67,8 @@ class FastSCODE(object):
         if num_cell is not None:
             self.num_cell = num_cell
 
-        self.exp_data = self.exp_data[:self.num_tf, :self.num_cell].astype(np.float32)
-        self.pseudotime = self.pseudotime[:self.num_cell].astype(np.float32)
+        self.exp_data = self.exp_data[:self.num_tf, :self.num_cell].astype(dtype)
+        self.pseudotime = self.pseudotime[:self.num_cell].astype(dtype)
         self.pseudotime = self.pseudotime / np.max(self.pseudotime)
 
         self.droot = droot
@@ -86,17 +86,21 @@ class FastSCODE(object):
                   new_b=None,
                   batch_size=None,
                   id=0,
-                  dtype=np.float32):
+                  dtype=np.float64):
         am = get_array_module(backend)
+
+        if backend.startswith('tf') or backend.startswith('tensorflow'):
+            device_id = backend.split(":")[-1]
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
         X = am.array(exp_data, dtype=dtype)  # (outer_batch, cell)
         pseudotime = am.array(pseudotime, dtype=dtype)  # (c)
         new_b = am.array(new_b, dtype=dtype)  # (sb, p)
 
         noise = am.random_uniform(low=-0.001, high=0.001, size=(len(new_b), new_b.shape[-1], len(pseudotime)))  # (sb, p, c)
-        Z = am.exp(am.dot(new_b[..., None], pseudotime[None, :])) + am.astype(noise, dtype='float32')  # (sb, p, c)
+        Z = am.exp(am.dot(new_b[..., None], pseudotime[None, :])) + am.astype(noise, dtype=dtype)  # (sb, p, c)
 
-        XtX = am.matmul(Z, am.transpose(Z, axes=(0, 2, 1)))  # (sb, p, p)
+        ZZt = am.matmul(Z, am.transpose(Z, axes=(0, 2, 1)))  # (sb, p, p)
 
         partsum_rss = np.zeros(len(new_b))
         list_W = []
@@ -105,12 +109,12 @@ class FastSCODE(object):
             end = start + batch_size
 
             batch_X = X[start:end]
-            Xty = am.matmul(Z, am.transpose(batch_X, axes=(1, 0)))  # (sb, p, g)
+            ZX = am.matmul(Z, am.transpose(batch_X, axes=(1, 0)))  # (sb, p, g)
 
             try:
-                W = am.linalg_solve(XtX, Xty)  # (sb, p, g)
+                W = am.linalg_solve(ZZt, ZX)  # (sb, p, g)
             except:
-                W = am.matmul(am.pinv(XtX), Xty)  # (sb, p, g)
+                W = am.matmul(am.pinv(ZZt), ZX)  # (sb, p, g)
 
             W = am.transpose(W, axes=(0, 2, 1))  # (sb, g, p)
             WZ = am.matmul(W, Z)  # (sb, g, c)
@@ -160,7 +164,7 @@ class FastSCODE(object):
 
         W = None
         new_b = np.random.uniform(low=self.min_b, high=self.max_b, size=(sampling_batch, self.num_z)).astype(np.float32) # (B, p)
-        old_b = np.zeros(new_b.shape[-1], dtype=new_b.dtype) # (p)
+        old_b = np.zeros(new_b.shape[-1], dtype=new_b.dtype)  # (p)
 
         if not batch_size:
             batch_size = len(self.exp_data)
