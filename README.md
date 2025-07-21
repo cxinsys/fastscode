@@ -54,3 +54,8 @@ Now, we need to install FastSCODE as a module.
 cd fastscode
 pip install -e .
 ```
+
+
+## TODO
+
+- [] Upload to PyPi
