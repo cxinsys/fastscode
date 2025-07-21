@@ -25,7 +25,7 @@ conda activate fastscode
 ```
 <br>
 
-%%
+<!--
 ### Install from PyPi
 
 ```
@@ -34,7 +34,7 @@ pip install fastscode
 - **Default backend framework of the FastSCODE is PyTorch.**- **You need to install other backend frameworks such as CuPy, Jax, and TensorFlow**
 
 <br>
-%%
+-->
 
 ### Install from GitHub repository
 
