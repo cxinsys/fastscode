@@ -58,4 +58,4 @@ pip install -e .
 
 ## TODO
 
-- [] Upload to PyPi
+- [ ] Upload to PyPi
