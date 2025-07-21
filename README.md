@@ -25,15 +25,16 @@ conda activate fastscode
 ```
 <br>
 
-//### Install from PyPi
+%%
+### Install from PyPi
 
-//```
-//pip install fastscode
-//```
-//- **Default backend framework of the FastSCODE is PyTorch.**
-//- **You need to install other backend frameworks such as CuPy, Jax, and TensorFlow**
+```
+pip install fastscode
+```
+- **Default backend framework of the FastSCODE is PyTorch.**- **You need to install other backend frameworks such as CuPy, Jax, and TensorFlow**
 
-//<br>
+<br>
+%%
 
 ### Install from GitHub repository
 
