@@ -117,7 +117,7 @@ rss, score_matrix = worker.run(backend='gpu',
 <br>
 <br>
 
-### Run FastSCODE with tutorial_notf.py
+### Run FastSCODE with run_scode.py
 
 - **Before run run_scode.py, batch_size_b and batch_size parameter must be modified to fit your gpu memory size**
 
@@ -186,7 +186,7 @@ GENE_M	0.34	0.012	0.032	...	0
 
 #### parameters
 
-- **result_matrix**: result TE matrix of fastscode, required
+- **result_matrix**: result score matrix of fastscode, required
 - **gene_names**: gene names from result matrix, required
 - **tfs**: tf list, optional
 - **fdr**: specifying fdr, optional, default: 0.01
@@ -201,7 +201,7 @@ result_matrix = result_matrix[1:, 1:].astype(np.float32)
 
 tf = np.loadtxt(fpath_tf, dtype=str)
 
-weaver = fte.NetWeaver(result_matrix=result_matrix,
+weaver = fs.NetWeaver(result_matrix=result_matrix,
                        gene_names=gene_name,
                        tfs=tf,
                        fdr=fdr,
@@ -246,7 +246,7 @@ python reconstruct_grn.py --fp_rm [result matrix path] --fp_tf [tf file path] --
 
 #### Example
 ```angular2html
-python reconstruct_grn.py --fp_rm TE_result_matrix.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
 ```
 
 #### Output
@@ -265,7 +265,7 @@ python reconstruct_grn.py --fp_rm [result matrix path] --fp_tf [tf file path] --
 
 #### Example
 ```angular2html
-python reconstruct_grn.py --fp_rm TE_result_matrix.txt--fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm score_result_matrix.txt--fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
 ```
 
 #### Output
