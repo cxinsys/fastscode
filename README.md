@@ -186,7 +186,7 @@ GENE_M	0.34	0.012	0.032	...	0
 
 #### parameters
 
-- **result_matrix**: result TE matrix of FastTENET, required
+- **result_matrix**: result TE matrix of fastscode, required
 - **gene_names**: gene names from result matrix, required
 - **tfs**: tf list, optional
 - **fdr**: specifying fdr, optional, default: 0.01
