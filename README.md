@@ -206,7 +206,7 @@ weaver = fs.NetWeaver(result_matrix=result_matrix,
                        tfs=tf,
                        fdr=fdr,
                        links=links,
-                       is_trimming=False,
+                       is_trimming=True,
                        trim_threshold=trim_threshold,
                        dtype=np.float32
                        )
@@ -252,6 +252,7 @@ python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_tf mouse_tf.txt -
 #### Output
 ```angular2html
 score_matrix.fdr0.01.sif, score_matrix.fdr0.01.sif.outdegrees.txt
+score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.outdegrees.txt
 ```
 
 <br>
@@ -270,6 +271,7 @@ python reconstruct_grn.py --fp_rm score_result_matrix.txt--fp_tf mouse_tf.txt --
 #### Output
 ```angular2html
 score_matrix.links1000.sif, score_matrix.links1000.sif.outdegrees.txt
+score_matrix.links1000.trimIndirect0.sif, score_matrix.links1000.trimIndirect0.sif.outdegrees.txt
 ```
 
 
