@@ -98,7 +98,7 @@ if __name__ == "__main__":
     tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
     extended_nn = np.concatenate((['Score'], node_name))
     tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
-    np.save(os.path.join(droot, f"score_sb-{sb}_batch-{batch_size}_z-{num_z}_iter-{max_iter}_repeat-{args.repeat}.npy"), tmp_rm)
+    np.savetxt(os.path.join(droot, f"score_result_matrix.txt"), tmp_rm, delimiter="\t", fmt="%s")
 
     execution_time = time.time() - s_time
 
