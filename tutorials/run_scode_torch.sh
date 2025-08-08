@@ -1,0 +1,12 @@
+python run_scode.py --droot . \
+                    --fp_exp expression_dataTuck_sub.csv \
+                    --fp_trj pseudotimeTuck.txt \
+                    --fp_branch cell_selectTuck.txt \
+                    --num_z 10 \
+                    --max_iter 10 \
+                    --backend gpu \
+                    --num_devices 8 \
+                    --batch_size_b 100 \
+                    --batch_size 4000 \
+                    --sp_droot out \
+                    --num_repeat 6

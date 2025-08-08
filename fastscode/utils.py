@@ -11,14 +11,14 @@ import numpy as np
 def save_results(droot, rss, W, A, B, node_name):
     os.makedirs(droot, exist_ok=True)
     np.savetxt(os.path.join(droot, "RSS.txt"), [rss], delimiter="\t", fmt="%.14f")
-    np.savetxt(os.path.join(droot, "W.txt"), W, delimiter="\t", fmt="%.14f")
+    # np.savetxt(os.path.join(droot, "W.txt"), W, delimiter="\t", fmt="%.14f")
 
     tmp_rm = np.concatenate([node_name[:, None], A.astype(str)], axis=1)
-    extended_nn = np.concatenate((['TE'], node_name))
+    extended_nn = np.concatenate((['Score'], node_name))
     tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
 
-    np.savetxt(os.path.join(droot, "A.txt"), tmp_rm, delimiter="\t", fmt="%s")
-    np.savetxt(os.path.join(droot, "B.txt"), B, delimiter="\t", fmt="%.14f")
+    np.savetxt(os.path.join(droot, "score_matrix.txt"), tmp_rm, delimiter="\t", fmt="%s")
+    # np.savetxt(os.path.join(droot, "B.txt"), B, delimiter="\t", fmt="%.14f")
 
 
 def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, num_gpus, dtype=np.float32):

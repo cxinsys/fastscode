@@ -12,6 +12,8 @@ from fastscode.inference.inference import NetWeaver
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='dpath parser')
     parser.add_argument('--fp_rm', type=str, dest='fp_rm', required=True)
+    parser.add_argument('--fp_gn', type=str, dest='fp_gn', required=False, default=0)
+    parser.add_argument('--fp_tf', type=str, dest='fp_tf', required=False, default='None')
     parser.add_argument('--fdr', type=float, dest='fdr', required=False, default=0.01)
     parser.add_argument('--links', type=int, dest='links', required=False, default=0)
     parser.add_argument('--trim_threshold', type=float, dest='trim_threshold', required=False, default=0)
@@ -32,16 +34,27 @@ if __name__ == "__main__":
     batch_size = args.batch_size
 
     result = np.loadtxt(fpath_rm, delimiter='\t', dtype=str)
-    gene_names = result[0][1:]
-    result = result[1:, 1:].astype(np.float64)
-    result = np.abs(result)
+    if not args.fp_gn:
+        gene_names = result[0][1:]
+        result = result[1:, 1:].astype(np.float64)
+        result = np.abs(result)
+    else:
+        gene_names = np.loadtxt(osp.abspath(args.fp_gn), delimiter='\t', dtype=str)
+        result = result.astype(np.float64)
+
+    if args.fp_tf != 'None':
+        fpath_tf = osp.abspath(args.fp_tf)
+        tf = np.loadtxt(fpath_tf, dtype=str)
+    else:
+        tf = None
 
     weaver = NetWeaver(result_matrix=result,
-                           gene_names=gene_names,
-                           links=links,
-                           is_trimming=True,
-                           trim_threshold=trim_threshold,
-                           dtype=np.float64)
+                       gene_names=gene_names,
+                       tfs=tf,
+                       links=links,
+                       is_trimming=True,
+                       trim_threshold=trim_threshold,
+                       dtype=np.float64)
 
     grns = weaver.run(backend="gpu", device_ids=1, batch_size=0)
 

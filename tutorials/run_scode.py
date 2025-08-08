@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_iter', type=int, dest='max_iter', required=False, default=100)
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
     parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
-    parser.add_argument('--sampling_batch', type=int, dest='sb', required=False, default=100)
+    parser.add_argument('--batch_size_b', type=int, dest='sb', required=False, default=100)
     parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=100)
     parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False, default='None')
     parser.add_argument('--num_repeat', type=int, dest='repeat', required=False, default=1)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     repeats = np.arange(args.repeat, dtype=np.int32)
 
-    As = []
+    scores = np.zeros((len(exp_data), len(exp_data)), dtype=np.float64)
     for r in repeats:
         if spath_droot is not None:
             spath_droot_r = osp.join(spath_droot, str(r))
@@ -87,18 +87,18 @@ if __name__ == "__main__":
                               max_iter=max_iter,
                               dtype=np.float32)
 
-        rss, W, A, B = worker.run(backend=backend,
+        rss, score_matrix = worker.run(backend=backend,
                                   device_ids=num_devices,
-                                  sampling_batch=sb,
+                                  batch_size_b=sb,
                                   batch_size=batch_size)
 
-        As.append(A)
+        scores += score_matrix
 
-    mean_A = np.mean(As, axis=0)
+    mean_A = scores / args.repeat
     tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
-    extended_nn = np.concatenate((['TE'], node_name))
+    extended_nn = np.concatenate((['Score'], node_name))
     tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
-    np.save(os.path.join(droot, f"meanA_sb-{sb}_batch-{batch_size}_z-{num_z}_iter-{max_iter}_repeat-{args.repeat}.npy"), tmp_rm)
+    np.save(os.path.join(droot, f"score_sb-{sb}_batch-{batch_size}_z-{num_z}_iter-{max_iter}_repeat-{args.repeat}.npy"), tmp_rm)
 
     execution_time = time.time() - s_time
 
