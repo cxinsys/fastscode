@@ -85,7 +85,8 @@ if __name__ == "__main__":
                               num_cell=None,
                               num_z=num_z,
                               max_iter=max_iter,
-                              dtype=np.float32)
+                              dtype=np.float32,
+                              use_binary=True)
 
         rss, score_matrix = worker.run(backend=backend,
                                   device_ids=num_devices,
@@ -95,10 +96,13 @@ if __name__ == "__main__":
         scores += score_matrix
 
     mean_A = scores / args.repeat
-    tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
-    extended_nn = np.concatenate((['Score'], node_name))
-    tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
-    np.savetxt(os.path.join(droot, f"score_result_matrix.txt"), tmp_rm, delimiter="\t", fmt="%s")
+    # tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
+    # extended_nn = np.concatenate((['Score'], node_name))
+    # tmp_rm = np.concatenate([extended_nn[None, :], tmp_rm])
+
+    np.savetxt(os.path.join(spath_droot, "node_name.txt"), node_name, delimiter="\t", fmt="%s")
+
+    np.save(os.path.join(spath_droot, "score_result_matrix.npy"), mean_A)
 
     execution_time = time.time() - s_time
 

@@ -33,7 +33,13 @@ if __name__ == "__main__":
     device_ids = args.device_ids
     batch_size = args.batch_size
 
-    result = np.loadtxt(fpath_rm, delimiter='\t', dtype=str)
+    if fpath_rm.endswith('txt'):
+        result = np.loadtxt(fpath_rm, delimiter='\t', dtype=str)
+    elif fpath_rm.endswith('npy'):
+        result = np.load(fpath_rm)
+    else:
+        raise ValueError("The result file must end with either .txt or .npy.")
+
     if not args.fp_gn:
         gene_names = result[0][1:]
         result = result[1:, 1:].astype(np.float64)

@@ -74,6 +74,7 @@ as well as several parameters for linear ODE optimization.
 - **max_b**: maximum initialization value for parameter b, optional, default: 2.0
 - **min_b**: minimum initialization value for parameter b, optional, default: -10.0
 - **dtype**: data type, optional, default: float32
+- **user_binary**: save result matrix as binary file, optional, default: True
 
 ```angular2html
 import fastscode as fs
@@ -92,7 +93,8 @@ worker = fs.FastSCODE(exp_data=exp_data,
                       num_cell=None,
                       num_z=num_z,
                       max_iter=max_iter,
-                      dtype=np.float32)
+                      dtype=np.float32,
+                      use_binary=True)
 ```
 
 <br>
@@ -154,15 +156,40 @@ python run_scode.py --droot .
 ```
 
 #### Output
+When use_binary is True  
 ```angular2html
 RSS.txt
-
 ex)
 3367844277.01837
 
 
-score_matrix.txt                            
+score_matrix.npy
+ex)
+0	0.05	0.02	...	0.004
+0.01	0	0.04	...	0.12
+0.003	0.003	0	...	0.001
+0.34	0.012	0.032	...	0
 
+
+node_name.txt
+ex)
+GENE_1
+GENE_2
+GENE_3
+.
+.
+.
+GENE_M
+```
+
+When use_binary is False  
+```angular2html
+RSS.txt
+ex)
+3367844277.01837
+
+  
+score_matrix.txt                            
 ex)
 Score	GENE_1	GENE_2	GENE_3	...	GENE_M
 GENE_1	0	0.05	0.02	...	0.004
@@ -236,17 +263,20 @@ trimmed_ods = weaver.count_outdegree(trimmed_grn)
 
 ### Downstream analysis with reconstruct_grn.py
 
-reconstruct_grn.py is a tutorial script for the output of grn and outdegree files.
+reconstruct_grn.py is a tutorial script for the output of grn and outdegree files. <br>
+When using a binary file, you must pass the path to the node_name.txt file to the --fp_gn parameter. <br>
+If it is not a binary file, the --fp_gn parameter is optional.
+
 
 #### Usage
-When specifying an fdr
+When specifying fdr
 ```angular2html
-python reconstruct_grn.py --fp_rm [result matrix path] --fp_tf [tf file path] --fdr [fdr] --backend [backend] --device_ids [number of device]
+python reconstruct_grn.py --fp_rm [result matrix path]  --fp_gn [gene name file path] --fp_tf [tf file path] --fdr [fdr] --backend [backend] --device_ids [number of device]
 ```
 
 #### Example
 ```angular2html
-python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
 ```
 
 #### Output
@@ -260,12 +290,12 @@ score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.o
 #### Usage
 When specifying the links
 ```angular2html
-python reconstruct_grn.py --fp_rm [result matrix path] --fp_tf [tf file path] --links [links] --backend [backend] --device_ids [number of device]
+python reconstruct_grn.py --fp_rm [result matrix path] --fp_gn [gene name file path]  --fp_tf [tf file path] --links [links] --backend [backend] --device_ids [number of device]
 ```
 
 #### Example
 ```angular2html
-python reconstruct_grn.py --fp_rm score_result_matrix.txt--fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
 ```
 
 #### Output
