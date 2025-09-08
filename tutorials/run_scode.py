@@ -48,7 +48,7 @@ if __name__ == "__main__":
     if args.sp_droot != 'None':
         spath_droot = osp.join(droot, args.sp_droot)
     else:
-        spath_droot = None
+        spath_droot = '.'
 
     backend = args.backend
     num_devices = args.num_devices
