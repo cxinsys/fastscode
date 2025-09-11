@@ -1,9 +1,12 @@
 import os
+import gc
 import os.path as osp
 import argparse
 import time
+import psutil
 import platform
 
+import pandas as pd
 import numpy as np
 
 import fastscode as fs
@@ -18,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_iter', type=int, dest='max_iter', required=False, default=100)
     parser.add_argument('--backend', type=str, dest='backend', required=False, default='gpu')
     parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
+    parser.add_argument('--ppd', type=int, required=False, default=1)
     parser.add_argument('--batch_size_b', type=int, dest='sb', required=False, default=100)
     parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=100)
     parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False, default='None')
@@ -48,16 +52,19 @@ if __name__ == "__main__":
     if args.sp_droot != 'None':
         spath_droot = osp.join(droot, args.sp_droot)
     else:
-        spath_droot = '.'
+        spath_droot = None
 
     backend = args.backend
     num_devices = args.num_devices
     sb = args.sb
     batch_size = args.batch_size
 
-    exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)  # cell x gene
-    node_name = exp_data[0, 1:]
-    exp_data = exp_data[1:, 1:].astype(np.float64).T  # gene x cell
+    print("Loading..")
+    with open(dpath_exp_data, 'r') as f:
+        node_name = np.array(f.readline().strip().split(',')[1:]).astype(str)
+
+    exp_data = np.loadtxt(dpath_exp_data, delimiter=',',
+                          skiprows=1, usecols=range(1, len(node_name) + 1), dtype=np.float32).T
 
     # # min-max norm
     # exp_data = (exp_data - np.min(exp_data, axis=1)[:, None]) / \
@@ -70,7 +77,9 @@ if __name__ == "__main__":
 
     repeats = np.arange(args.repeat, dtype=np.int32)
 
-    scores = np.zeros((len(exp_data), len(exp_data)), dtype=np.float64)
+    scores = np.zeros((len(exp_data), len(exp_data)), dtype=np.float32)
+    gc.collect()
+
     for r in repeats:
         if spath_droot is not None:
             spath_droot_r = osp.join(spath_droot, str(r))
@@ -89,12 +98,14 @@ if __name__ == "__main__":
                               use_binary=True)
 
         rss, score_matrix = worker.run(backend=backend,
-                                  device_ids=num_devices,
-                                  batch_size_b=sb,
-                                  batch_size=batch_size)
+                                       device_ids=num_devices,
+                                       procs_per_device=args.ppd,
+                                       batch_size_b=sb,
+                                       batch_size=batch_size)
 
         scores += score_matrix
 
+    s1time = time.time()
     mean_A = scores / args.repeat
     # tmp_rm = np.concatenate([node_name[:, None], mean_A.astype(str)], axis=1)
     # extended_nn = np.concatenate((['Score'], node_name))
@@ -104,11 +115,11 @@ if __name__ == "__main__":
 
     np.save(os.path.join(spath_droot, "score_result_matrix.npy"), mean_A)
 
+    print("Elapsed time for saving matrix: ", time.time() - s1time)
+
     execution_time = time.time() - s_time
 
     with open(fout_stats, 'a') as f:
         f.write("%s,%s,%s,%d,%d,%d,%d,%d,%d,%f\n" % (platform.node().upper(), dataset, backend,
-                                                  num_devices, sb, batch_size,
-                                                  num_z, max_iter, args.repeat, execution_time))
-
-
+                                                     num_devices, sb, batch_size,
+                                                     num_z, max_iter, args.repeat, execution_time))
