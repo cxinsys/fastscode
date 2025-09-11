@@ -5,7 +5,6 @@ import argparse
 import time
 import platform
 
-import pandas as pd
 import numpy as np
 
 import fastscode as fs
