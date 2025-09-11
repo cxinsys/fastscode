@@ -3,7 +3,6 @@ import gc
 import os.path as osp
 import argparse
 import time
-import psutil
 import platform
 
 import pandas as pd
