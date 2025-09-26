@@ -134,7 +134,6 @@ python run_scode.py --droot [root directory]
                     --backend [name of backend framework]
                     --num_devices [number of devices]
                     --batch_size_b [number of parameter b]
-                    --batch_size [number of batch size]
                     --sp_droot [droot directory for saving results]
                     --num_repeat [total number of computation iterations]
 ```
@@ -150,7 +149,6 @@ python run_scode.py --droot .
                     --backend gpu
                     --num_devices 8
                     --batch_size_b 10
-                    --batch_size 4000
                     --sp_droot out
                     --num_repeat 6
 ```
