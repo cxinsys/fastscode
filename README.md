@@ -106,8 +106,8 @@ worker = fs.FastSCODE(exp_data=exp_data,
 - **backend**: optional, default: 'cpu'
 - **device_ids**: list or number of devcies to use, optional, default: [0] (cpu), [list of whole gpu devices] (gpu) 
 - **batch_size_b**: batch size of optimization parameter B, optional, default: 1
-- **batch_size**: gene batch size of expression data, optional, default: compute all gene data at once
-
+- **batch_size**: gene batch size of expression data, optional, default: None (compute all gene data at once, recommended)
+- **chunk_size**: gene chunk size of expression data in inner loop of algorithm, optional, default: None (auto calculated)
 
 ```angular2html
 rss, score_matrix = worker.run(backend='gpu',

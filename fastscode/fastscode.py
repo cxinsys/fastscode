@@ -13,7 +13,7 @@ import numpy as np
 from mate.array import get_array_module
 from mate.utils import get_device_list
 
-from fastscode.utils import calculate_batchsize, check_gpu_computability, save_results
+from fastscode.utils import compute_chunk_size, check_gpu_computability, save_results
 from fastscode.worker import WorkerProcess
 
 
@@ -90,6 +90,7 @@ class FastSCODE(object):
             procs_per_device=None,
             batch_size_b=1,
             batch_size=None,
+            chunk_size=None,
             seed=None
             ):
 
@@ -128,7 +129,14 @@ class FastSCODE(object):
         if not batch_size:
             batch_size = len(self.exp_data)
 
-        outer_batch = np.ceil(len(self.exp_data) / (len(device_ids) * procs_per_device)).astype(np.int32)
+        gpu_batch = np.ceil(len(self.exp_data) / (len(device_ids) * procs_per_device)).astype(np.int32)
+
+        if chunk_size is None:
+            chunk_size = compute_chunk_size(batch=batch_size,
+                                                    C=len(self.pseudotime),
+                                                    sb=batch_size_b,
+                                                    D=new_b.shape[-1],
+                                                    dtype=self.dtype)
 
         multiprocessing.set_start_method('spawn', force=True)
 
@@ -136,8 +144,8 @@ class FastSCODE(object):
         result_queue = Queue()
 
         worker_data = []
-        for j, start in enumerate(range(0, len(self.exp_data), outer_batch)):
-            end = start + outer_batch
+        for j, start in enumerate(range(0, len(self.exp_data), gpu_batch)):
+            end = start + gpu_batch
             worker_data.append({
                 'backend': backend + ":" + str(device_ids[j % len(device_ids)]),
                 'exp_data': self.exp_data[start:end, :],
@@ -160,16 +168,19 @@ class FastSCODE(object):
                 exp_data=worker_data[worker_idx]['exp_data'],
                 pseudotime=worker_data[worker_idx]['pseudotime'],
                 batch_size=worker_data[worker_idx]['batch_size'],
+                chunk_size=chunk_size,
                 dtype=worker_data[worker_idx]['dtype'],
                 task_queue=task_queue,
-                result_queue=result_queue
+                result_queue=result_queue,
+                sb=batch_size_b,
+                D=new_b.shape[-1]
             )
 
             workers.append(worker)
             worker.start()
 
-        print("[DEVICE: {}, Num. GPUS: {}, Process per device: {}, Sampling Batch: {}, Batch Size: {}]"
-              .format(backend, len(device_ids), procs_per_device, batch_size_b, batch_size))
+        print("[DEVICE: {}, Num. GPUS: {}, Process per device: {}, Sampling Batch: {}, Batch Size: {}, Chunk Size: {}]"
+              .format(backend, len(device_ids), procs_per_device, batch_size_b, batch_size, chunk_size))
 
         try:
             list_W = []

@@ -21,7 +21,8 @@ if __name__ == "__main__":
     parser.add_argument('--num_devices', type=int, dest='num_devices', required=False, default=1)
     parser.add_argument('--ppd', type=int, required=False, default=1)
     parser.add_argument('--batch_size_b', type=int, dest='sb', required=False, default=100)
-    parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=100)
+    parser.add_argument('--batch_size', type=int, dest='batch_size', required=False, default=None)
+    parser.add_argument('--chunk_size', type=int, dest='chunk_size', required=False, default=None)
     parser.add_argument('--sp_droot', type=str, dest='sp_droot', required=False, default='None')
     parser.add_argument('--num_repeat', type=int, dest='repeat', required=False, default=1)
 
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     num_devices = args.num_devices
     sb = args.sb
     batch_size = args.batch_size
+    chunk_size = args.chunk_size
 
     print("Loading..")
     with open(dpath_exp_data, 'r') as f:
@@ -99,7 +101,8 @@ if __name__ == "__main__":
                                        device_ids=num_devices,
                                        procs_per_device=args.ppd,
                                        batch_size_b=sb,
-                                       batch_size=batch_size)
+                                       batch_size=batch_size,
+                                       chunk_size=chunk_size)
 
         scores += score_matrix
 
