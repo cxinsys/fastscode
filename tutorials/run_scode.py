@@ -120,7 +120,9 @@ if __name__ == "__main__":
 
     execution_time = time.time() - s_time
 
+    if chunk_size is None:
+        chunk_size = len(exp_data)
     with open(fout_stats, 'a') as f:
         f.write("%s,%s,%s,%d,%d,%d,%d,%d,%d,%f\n" % (platform.node().upper(), dataset, backend,
-                                                     num_devices, sb, batch_size,
+                                                     num_devices, sb, chunk_size,
                                                      num_z, max_iter, args.repeat, execution_time))
