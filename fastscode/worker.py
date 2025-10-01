@@ -27,8 +27,9 @@ class WorkerProcess(Process):
         self.X = None
 
     def setup_backend(self):
-        device_id = self.backend.split(":")[-1]
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
+        if self.backend.split(":")[0] in ["tf", "tensorflow", "jax"]:
+            device_id = self.backend.split(":")[-1]
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
         self.am = get_array_module(self.backend)
 
