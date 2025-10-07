@@ -11,7 +11,7 @@
 ### Create a virtual environment
 
 After installing Anaconda, create a conda virtual environment for FastSCODE.
-you can also specify the Python version (e.g. `python=3.12`).
+We can also specify the Python version (e.g. `python=3.12`).
 
 ```bash
 conda create -n fastscode python=3.12
@@ -153,7 +153,8 @@ python run_scode.py --droot .
 ```
 
 #### Output
-When `use_binary` is True  
+When `use_binary` is True, we can obtain the following result.
+
 ```
 RSS.txt
 ex)
@@ -179,7 +180,7 @@ GENE_3
 GENE_M
 ```
 
-When use_binary is False  
+When use_binary is False, we can obtain the following result.
 ```
 RSS.txt
 ex)
@@ -260,12 +261,13 @@ trimmed_ods = weaver.count_outdegree(trimmed_grn)
 ### Downstream analysis with `reconstruct_grn.py`
 
 `reconstruct_grn.py` shows an example of utilizing the output of `grn` and `outdegree` files. <br>
-When using a binary file, you must pass the path to the `node_name.txt` file to the `--fp_gn parameter`. <br>
+When using a binary file, we must pass the path to the `node_name.txt` file to the `--fp_gn parameter`. <br>
 If it is not a binary file, the `--fp_gn` parameter is optional.
 
 
 #### Usage
-When specifying fdr
+We can specify fdr as follows.
+
 ```bash
 python reconstruct_grn.py --fp_rm [result matrix path]  --fp_gn [gene name file path] --fp_tf [tf file path] --fdr [fdr] --backend [backend] --device_ids [number of device]
 ```
@@ -284,7 +286,8 @@ score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.o
 <br>
 
 #### Usage
-When specifying the links
+We can also specify the links.
+
 ```bash
 python reconstruct_grn.py --fp_rm [result matrix path] --fp_gn [gene name file path]  --fp_tf [tf file path] --links [links] --backend [backend] --device_ids [number of device]
 ```
