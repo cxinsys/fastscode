@@ -2,7 +2,7 @@
 
 
 ## Indroduction
-- FastSCODE: an accelerated implementation of SCODE based on manycore computing 
+- FastSCODE is an accelerated implementation of [SCODE](https://github.com/hmatsu1226/SCODE) based on manycore computing.
 
 ## Installation
 - :snake: [Anaconda](https://www.anaconda.com) is recommended to use and develop FastSCODE.
@@ -59,7 +59,7 @@ pip install -e .
 
 ### Create FastSCODE instance
 
-The FastSCODE class requires loaded files such as expression data arrays and pseudo time arrays, 
+The FastSCODE class requires input files such as expression data arrays and pseudo time arrays, 
 as well as several parameters for linear ODE optimization.
 
 #### parameters
@@ -154,7 +154,7 @@ python run_scode.py --droot .
 ```
 
 #### Output
-When use_binary is True  
+When `use_binary` is True  
 ```
 RSS.txt
 ex)
@@ -203,10 +203,9 @@ GENE_M	0.34	0.012	0.032	...	0
 <br>
 
 
-## Downstream analysis tutorial
+## A tutorial for downstream analysis
 
 ### Create NetWeaver instance
-
 
 
 #### parameters
@@ -259,11 +258,11 @@ trimmed_ods = weaver.count_outdegree(trimmed_grn)
 <br>
 <br>
 
-### Downstream analysis with reconstruct_grn.py
+### Downstream analysis with `reconstruct_grn.py`
 
-reconstruct_grn.py is a tutorial script for the output of grn and outdegree files. <br>
-When using a binary file, you must pass the path to the node_name.txt file to the --fp_gn parameter. <br>
-If it is not a binary file, the --fp_gn parameter is optional.
+`reconstruct_grn.py` shows an example of utilizing the output of `grn` and `outdegree` files. <br>
+When using a binary file, you must pass the path to the `node_name.txt` file to the `--fp_gn parameter`. <br>
+If it is not a binary file, the `--fp_gn` parameter is optional.
 
 
 #### Usage
