@@ -14,13 +14,13 @@ After installing anaconda, create a conda virtual environment for FastSCODE.
 In the following command, you can change the Python version
 (e.g. `python=3.12`).
 
-```
+```bash
 conda create -n fastscode python=3.12
 ```
 
 Now, we can activate our virtual environment for FastSCODE as follows.
 
-```
+```bash
 conda activate fastscode
 ```
 <br>
@@ -28,7 +28,7 @@ conda activate fastscode
 
 ### Install from PyPi
 
-```
+```bash
 pip install fastscode
 ```
 - **Default backend framework of the FastSCODE is PyTorch.**- **You need to install other backend frameworks such as CuPy, Jax, and TensorFlow**
@@ -76,7 +76,7 @@ as well as several parameters for linear ODE optimization.
 - **dtype**: data type, optional, default: float32
 - **use_binary**: save result matrix as binary file, optional, default: True
 
-```angular2html
+```python
 import fastscode as fs
 
 exp_data = np.loadtxt(dpath_exp_data, delimiter=",", dtype=str)
@@ -109,7 +109,7 @@ worker = fs.FastSCODE(exp_data=exp_data,
 - **batch_size**: gene batch size of expression data, optional, default: None (compute all gene data at once, recommended)
 - **chunk_size**: gene chunk size of expression data in inner loop of algorithm, optional, default: None (auto calculated)
 
-```angular2html
+```python
 rss, score_matrix = worker.run(backend='gpu',
                                device_ids=8,
                                sampling_batch=100,
@@ -124,7 +124,7 @@ rss, score_matrix = worker.run(backend='gpu',
 - **Before run run_scode.py, batch_size_b and batch_size parameter must be modified to fit your gpu memory size**
 
 #### Usage
-```angular2html
+```bash
 python run_scode.py --droot [root directory]
                     --fp_exp [expression file path]
                     --fp_trj [trajectory (pseudotime) file path] 
@@ -139,7 +139,7 @@ python run_scode.py --droot [root directory]
 ```
 
 #### Example
-```angular2html
+```bash
 python run_scode.py --droot .
                     --fp_exp expression_dataTuck_sub.csv
                     --fp_trj pseudotimeTuck.txt
@@ -155,7 +155,7 @@ python run_scode.py --droot .
 
 #### Output
 When use_binary is True  
-```angular2html
+```
 RSS.txt
 ex)
 3367844277.01837
@@ -181,7 +181,7 @@ GENE_M
 ```
 
 When use_binary is False  
-```angular2html
+```
 RSS.txt
 ex)
 3367844277.01837
@@ -219,7 +219,7 @@ GENE_M	0.34	0.012	0.032	...	0
 - **is_trimming**: if set True, trimming operation is applied on grn, optional, default: True
 - **trim_threshold**: trimming threshold, optional, default: 0
 
-```angular2html
+```python
 result_matrix = np.loadtxt(fpath_result_matrix, delimiter='\t', dtype=str)
 gene_name = result_matrix[0][1:]
 result_matrix = result_matrix[1:, 1:].astype(np.float32)
@@ -242,7 +242,7 @@ weaver = fs.NetWeaver(result_matrix=result_matrix,
 - **device_ids**: list or number of devices to use, optional, default: [0] (cpu), [list of whole gpu devices] (gpu) 
 - **batch_size**: if set to 0, batch size will automatically calculated, optional, default: 0
 
-```angular2html
+```python
 grn, trimmed_grn = weaver.run(backend=backend,
                               device_ids=device_ids,
                               batch_size=batch_size)
@@ -251,7 +251,7 @@ grn, trimmed_grn = weaver.run(backend=backend,
 ### Count outdegree
 - **grn**: required
 
-```angular2html
+```python
 outdegrees = weaver.count_outdegree(grn)
 trimmed_ods = weaver.count_outdegree(trimmed_grn)
 ```
@@ -268,17 +268,17 @@ If it is not a binary file, the --fp_gn parameter is optional.
 
 #### Usage
 When specifying fdr
-```angular2html
+```bash
 python reconstruct_grn.py --fp_rm [result matrix path]  --fp_gn [gene name file path] --fp_tf [tf file path] --fdr [fdr] --backend [backend] --device_ids [number of device]
 ```
 
 #### Example
-```angular2html
+```bash
 python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
 ```
 
 #### Output
-```angular2html
+```bash
 score_matrix.fdr0.01.sif, score_matrix.fdr0.01.sif.outdegrees.txt
 score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.outdegrees.txt
 ```
@@ -287,17 +287,17 @@ score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.o
 
 #### Usage
 When specifying the links
-```angular2html
+```bash
 python reconstruct_grn.py --fp_rm [result matrix path] --fp_gn [gene name file path]  --fp_tf [tf file path] --links [links] --backend [backend] --device_ids [number of device]
 ```
 
 #### Example
-```angular2html
+```bash
 python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
 ```
 
 #### Output
-```angular2html
+```csv
 score_matrix.links1000.sif, score_matrix.links1000.sif.outdegrees.txt
 score_matrix.links1000.trimIndirect0.sif, score_matrix.links1000.trimIndirect0.sif.outdegrees.txt
 ```
