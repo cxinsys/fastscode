@@ -8,17 +8,16 @@
 - :snake: [Anaconda](https://www.anaconda.com) is recommended to use and develop FastSCODE.
 - :penguin: Linux distros are tested and recommended to use and develop FastSCODE.
 
-### Anaconda virtual environment
+### Create a virtual environment
 
-After installing anaconda, create a conda virtual environment for FastSCODE.
-In the following command, you can change the Python version
-(e.g. `python=3.12`).
+After installing Anaconda, create a conda virtual environment for FastSCODE.
+you can also specify the Python version (e.g. `python=3.12`).
 
 ```bash
 conda create -n fastscode python=3.12
 ```
 
-Now, we can activate our virtual environment for FastSCODE as follows.
+Now, we can activate our conda virtual environment for FastSCODE as follows.
 
 ```bash
 conda activate fastscode
@@ -57,7 +56,7 @@ pip install -e .
 
 ## FastSCODE tutorial
 
-### Create FastSCODE instance
+### Create `FastSCODE` instance
 
 The FastSCODE class requires input files such as expression data arrays and pseudo time arrays, 
 as well as several parameters for linear ODE optimization.
@@ -119,7 +118,7 @@ rss, score_matrix = worker.run(backend='gpu',
 <br>
 <br>
 
-### Run FastSCODE with run_scode.py
+### Run FastSCODE with `run_scode.py`
 
 - **Before run run_scode.py, batch_size_b and batch_size parameter must be modified to fit your gpu memory size**
 
@@ -205,8 +204,9 @@ GENE_M	0.34	0.012	0.032	...	0
 
 ## A tutorial for downstream analysis
 
-### Create NetWeaver instance
+### Create `NetWeaver` instance
 
+`NetWeaver` infers the network links based on the results of running FastSCODE.
 
 #### parameters
 
@@ -226,17 +226,16 @@ result_matrix = result_matrix[1:, 1:].astype(np.float32)
 tf = np.loadtxt(fpath_tf, dtype=str)
 
 weaver = fs.NetWeaver(result_matrix=result_matrix,
-                       gene_names=gene_name,
-                       tfs=tf,
-                       fdr=fdr,
-                       links=links,
-                       is_trimming=True,
-                       trim_threshold=trim_threshold,
-                       dtype=np.float32
-                       )
+                      gene_names=gene_name,
+                      tfs=tf,
+                      fdr=fdr,
+                      links=links,
+                      is_trimming=True,
+                      trim_threshold=trim_threshold,
+                      dtype=np.float32)
 ```
 
-### Run weaver
+### Run NetWeaver
 - **backend**: optional, default: 'cpu'
 - **device_ids**: list or number of devices to use, optional, default: [0] (cpu), [list of whole gpu devices] (gpu) 
 - **batch_size**: if set to 0, batch size will automatically calculated, optional, default: 0
