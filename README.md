@@ -30,7 +30,8 @@ conda activate fastscode
 ```bash
 pip install fastscode
 ```
-- **Default backend framework of the FastSCODE is PyTorch.**- **You need to install other backend frameworks such as CuPy, Jax, and TensorFlow**
+- 🔥**The default backend framework of FastSCODE is [PyTorch](https://pytorch.org/).**
+- 📱**You can install another backend framework such as [CuPy](https://cupy.dev/), [Jax](https://github.com/jax-ml/jax), and [TensorFlow](https://www.tensorflow.org/)**
 
 <br>
 
