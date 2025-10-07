@@ -74,7 +74,7 @@ as well as several parameters for linear ODE optimization.
 - **max_b**: maximum initialization value for parameter b, optional, default: 2.0
 - **min_b**: minimum initialization value for parameter b, optional, default: -10.0
 - **dtype**: data type, optional, default: float32
-- **user_binary**: save result matrix as binary file, optional, default: True
+- **use_binary**: save result matrix as binary file, optional, default: True
 
 ```angular2html
 import fastscode as fs
