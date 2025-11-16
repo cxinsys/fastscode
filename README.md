@@ -121,7 +121,7 @@ rss, score_matrix = worker.run(backend='gpu',
 
 ### Run FastSCODE with `run_scode.py`
 
-- **Before run run_scode.py, batch_size_b and batch_size parameter must be modified to fit your gpu memory size**
+- Before run `run_scode.py`, `batch_size_b` and `batch_size` must be adjusted to fit your gpu memory size.
 
 #### Usage
 ```bash
