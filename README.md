@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo.png" alt="Drawing" width="600px"/></p>
 
 
-## Indroduction
+## Introduction
 - FastSCODE is an accelerated implementation of [SCODE](https://github.com/hmatsu1226/SCODE) based on manycore computing.
 
 ## Installation
