@@ -259,9 +259,9 @@ trimmed_ods = weaver.count_outdegree(trimmed_grn)
 <br>
 <br>
 
-### Downstream analysis with `reconstruct_grn.py`
+### Network reconstruction
 
-`reconstruct_grn.py` shows an example of utilizing the output of `grn` and `outdegree` files. <br>
+`reconstruct_grn.py` shows an example of reconstructing network structures from the output of `grn` and `outdegree` files. <br>
 When using a binary file, we must pass the path to the `node_name.txt` file to the `--fp_gn parameter`. <br>
 If it is not a binary file, the `--fp_gn` parameter is optional.
 
