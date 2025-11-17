@@ -24,20 +24,16 @@ def save_results(droot, rss, A, node_name, use_binary=True):
         np.savetxt(os.path.join(droot, "score_matrix.txt"), tmp_rm, delimiter="\t", fmt="%s")
 
 
-def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, num_gpus, dtype=np.float32):
-    # 데이터 타입 크기
+def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, dtype=np.float32):
     dtype_size = np.dtype(dtype).itemsize
 
-    # 크기 정보
-    g, c = exp_data_shape  # exp_data 크기 (g: gene, c: cell)
-    s, z = new_b_shape  # new_b 크기 (s: sampling batch, z: latent factor)
+    g, c = exp_data_shape # (g: gene, c: cell)
+    s, z = new_b_shape  # (s: sampling batch, z: latent factor)
 
-    # 입력 데이터 메모리 크기
     exp_data_memory = batch * c * dtype_size  # exp_data
     pseudotime_memory = c * dtype_size  # pseudotime
     new_b_memory = s * z * dtype_size  # new_b
 
-    # 중간 계산 배열 메모리 크기
     Z_memory = s * z * c * dtype_size  # Z
     XtX_memory = s * z * z * dtype_size  # XtX
     Xty_memory = s * z * batch * dtype_size  # Xty
@@ -54,20 +50,14 @@ def calculate_lm_memory_usage(batch, exp_data_shape, new_b_shape, num_gpus, dtyp
 def compute_chunk_size(batch, C, sb, D, dtype=np.float32):
     size = np.dtype(dtype).itemsize
 
-    # 초기화 배열들 메모리 크기
     # X: batch x C, pseudotime: C, new_b: sb x D, noise: sb x D x C, Z: sb x D x C, ZZt: sb x D x D
     init_mem = ((batch + 1) * C + (1 + 2 * C + D) * D * sb) * size
 
-    # GPU 메모리
     gpu_mem = get_gpu_memory(0)
 
-    # 초기화 제외 남은 메모리
     remain_mem = gpu_mem - init_mem
 
-    # 청크기준 생성 배열 메모리 크기
     # batch_X: chunk x C, ZX: sb x D x chunk, W: sb x D x chunk, Wt: sb x chunk x D, WZ: sb x chunk x C, diffs: sb x chunk x C, tmp_rss: sb
-
-    # 청크 계산
     chunk = int(remain_mem // ((3 * sb * D + (1 + 2 * sb) * C + sb) * size))
 
     if chunk < 1:
@@ -80,18 +70,14 @@ def compute_chunk_size(batch, C, sb, D, dtype=np.float32):
 
 
 def check_gpu_computability(w_shape, new_b_shape, dtype=np.float32):
-    # 데이터 타입 크기 (float64는 8바이트)
     dtype_size = np.dtype(dtype).itemsize
 
-    # 크기 정보
-    g, z = w_shape  # exp_data 크기 (g: gene, c: cell)
-    z = new_b_shape[-1]  # new_b 크기 (z: latent factor)
+    g, z = w_shape  # (g: gene, c: cell)
+    z = new_b_shape[-1]  # (z: latent factor)
 
-    # 입력 데이터 메모리 크기
     b_matrix_memory = z * z * dtype_size  # exp_data
     w_memory = g * z * dtype_size  # pseudotime
 
-    # 중간 계산 배열 메모리 크기
     inv_w_memory = z * g * dtype_size  # Z
 
     total_memory = (b_matrix_memory + w_memory + inv_w_memory) / (1024 ** 2)
@@ -102,7 +88,7 @@ def check_gpu_computability(w_shape, new_b_shape, dtype=np.float32):
 
 
 def get_gpu_memory(gpu_index=0):
-    torch.cuda.set_device(gpu_index)  # GPU 선택
+    torch.cuda.set_device(gpu_index)
     total_memory = torch.cuda.get_device_properties(gpu_index).total_memory
 
     return 0.7 * total_memory

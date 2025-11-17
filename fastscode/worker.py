@@ -50,7 +50,7 @@ class WorkerProcess(Process):
                                                                                                         self.dtype)  # (sb, p, c)
         ZZt = self.am.matmul(Z, self.am.transpose(Z, axes=(0, 2, 1)))  # (sb, p, p)
 
-        partsum_rss = np.zeros(len(new_b))
+        partsum_rss = self.am.zeros(len(new_b), dtype=self.dtype)
         list_W = []
 
         # print("Batch size: ", self.batch_size, "Chunk size: ", self.chunk_size)
@@ -77,9 +77,10 @@ class WorkerProcess(Process):
                 diffs = (batch_X - WZ) ** 2
                 tmp_rss = self.am.sum(diffs, axis=(1, 2))  # (sb)
 
-                partsum_rss += self.am.asnumpy(tmp_rss)  # (sb)
+                partsum_rss += tmp_rss
                 list_W.append(self.am.asnumpy(W))
 
+        partsum_rss = self.am.asnumpy(partsum_rss)
         return partsum_rss, list_W
 
     def run(self):

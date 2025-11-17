@@ -45,7 +45,7 @@ def calculate_memory_usage(shape, dtype):
     return fix, other
 
 def get_gpu_memory(gpu_index=0):
-    torch.cuda.set_device(gpu_index)  # GPU 선택
+    torch.cuda.set_device(gpu_index)
     total_memory = torch.cuda.get_device_properties(gpu_index).total_memory
 
     return 0.9 * (total_memory / (1024 ** 2))
