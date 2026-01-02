@@ -13,7 +13,7 @@ python run_scode.py --droot . \
 python reconstruct_grn.py \
  --fp_rm out/avg_score_matrix.npy \
  --fp_gn node_name.txt \
- --fp_tf mouse_tf.txt \
+ --fp_tf mouse_tfs.txt \
  --fdr 0.01 \
  --backend gpu \
  --device_ids 1
