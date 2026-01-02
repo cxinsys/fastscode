@@ -131,7 +131,7 @@ class FastSCODE(object):
 
         gpu_batch = np.ceil(len(self.exp_data) / (len(device_ids) * procs_per_device)).astype(np.int32)
 
-        if chunk_size is None:
+        if not chunk_size:
             chunk_size = compute_chunk_size(batch=batch_size,
                                                     C=len(self.pseudotime),
                                                     sb=batch_size_b,
