@@ -11,7 +11,7 @@ python run_scode.py --droot . \
                     --num_repeat 6
 
 python reconstruct_grn.py \
- --fp_rm score_result_matrix.txt \
+ --fp_rm avg_score_matrix.npy \
  --fp_gn node_name.txt \
  --fp_tf mouse_tf.txt \
  --fdr 0.01 \

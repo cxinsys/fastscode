@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     np.savetxt(os.path.join(spath_droot, "node_name.txt"), node_name, delimiter="\t", fmt="%s")
 
-    np.save(os.path.join(spath_droot, "score_result_matrix.npy"), mean_A)
+    np.save(os.path.join(spath_droot, "avg_score_matrix.npy"), mean_A)
 
     print("Elapsed time for saving matrix: ", time.time() - s1time)
 

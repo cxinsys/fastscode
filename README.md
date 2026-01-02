@@ -154,6 +154,30 @@ python run_scode.py --droot .
 ```
 
 #### Output
+The average matrix for the repeatedly computed score matrix is saved as a binary file in `--sp_droot`. 
+
+```
+avg_score_matrix.npy
+ex)
+0	0.05	0.02	...	0.004
+0.01	0	0.04	...	0.12
+0.003	0.003	0	...	0.001
+0.34	0.012	0.032	...	0
+
+
+node_name.txt
+ex)
+GENE_1
+GENE_2
+GENE_3
+.
+.
+.
+GENE_M
+```
+
+The result file for each iteration is saved in the `[Number of repetation]` folder under `--sp_droot`. 
+
 When `use_binary` is True, we can obtain the following result.
 
 ```
@@ -181,7 +205,8 @@ GENE_3
 GENE_M
 ```
 
-When use_binary is False, we can obtain the following result.
+When `use_binary` is False, we can obtain the following result.
+
 ```
 RSS.txt
 ex)
@@ -275,13 +300,13 @@ python reconstruct_grn.py --fp_rm [result matrix path]  --fp_gn [gene name file 
 
 #### Example
 ```bash
-python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm avg_score_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --fdr 0.01 --backend gpu --device_ids 1
 ```
 
 #### Output
-```bash
-score_matrix.fdr0.01.sif, score_matrix.fdr0.01.sif.outdegrees.txt
-score_matrix.fdr0.01.trimIndirect0.sif, score_matrix.fdr0.01.trimIndirect0.sif.outdegrees.txt
+```csv
+avg_score_matrix.fdr0.01.sif, avg_score_matrix.fdr0.01.sif.outdegrees.txt
+avg_score_matrix.fdr0.01.trimIndirect0.sif, avg_score_matrix.fdr0.01.trimIndirect0.sif.outdegrees.txt
 ```
 
 <br>
@@ -295,13 +320,13 @@ python reconstruct_grn.py --fp_rm [result matrix path] --fp_gn [gene name file p
 
 #### Example
 ```bash
-python reconstruct_grn.py --fp_rm score_result_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
+python reconstruct_grn.py --fp_rm avg_score_matrix.txt --fp_gn node_name.txt --fp_tf mouse_tf.txt --links 1000 --backend gpu --device_ids 1
 ```
 
 #### Output
 ```csv
-score_matrix.links1000.sif, score_matrix.links1000.sif.outdegrees.txt
-score_matrix.links1000.trimIndirect0.sif, score_matrix.links1000.trimIndirect0.sif.outdegrees.txt
+avg_score_matrix.links1000.sif, avg_score_matrix.links1000.sif.outdegrees.txt
+avg_score_matrix.links1000.trimIndirect0.sif, avg_score_matrix.links1000.trimIndirect0.sif.outdegrees.txt
 ```
 
 
