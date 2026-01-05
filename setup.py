@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='fastscode',
-      version='0.0.7',
+      version='0.0.8',
       description='FastSCODE',
       # url='http://github.com/cxinsys/fasttenet',
       author='Complex Intelligent Systems Laboratory (CISLAB)',
